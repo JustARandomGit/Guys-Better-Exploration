@@ -3,11 +3,9 @@ package github.justarandomgit.gbe.items;
 import github.justarandomgit.gbe.GuysBetterExploration;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -22,22 +20,25 @@ import static github.justarandomgit.gbe.init.ComponentInit.MAX_EXPERIENCE;
 import static github.justarandomgit.gbe.utils.sounds.playSound;
 
 public class SculkVial extends Item {
+    // Default maximum experience, 1395 is 30 levels exactly in vanilla Minecraft
+    public static final int max_experience=1395;
+
     public SculkVial(Settings settings) {
         super(settings);
     }
 
     @Override
     public boolean hasGlint(ItemStack stack) {
-        return stack.getOrDefault(MAX_EXPERIENCE, 1395) - stack.getOrDefault(EXPERIENCE_STORED, 0) <= 0;
+        return stack.getOrDefault(MAX_EXPERIENCE, SculkVial.max_experience) - stack.getOrDefault(EXPERIENCE_STORED, 0) <= 0;
     }
 
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        int exp_stored = stack.get(EXPERIENCE_STORED);
-        int max_exp = stack.get(MAX_EXPERIENCE);
+        int exp_stored = stack.getOrDefault(EXPERIENCE_STORED, 0);
+        int max_exp = stack.getOrDefault(MAX_EXPERIENCE, SculkVial.max_experience);
 
         tooltip.add(Text.translatable("item.gbe.sculk_vial.info", exp_stored, max_exp)
-                .formatted(Formatting.GREEN, Formatting.ITALIC));
+                .formatted(Formatting.BLUE));
     }
 
     @Override
@@ -51,9 +52,9 @@ public class SculkVial extends Item {
         }
 
         int experience_stored = stack.getOrDefault(EXPERIENCE_STORED, 0);
-        int max_experience = stack.getOrDefault(MAX_EXPERIENCE, 1395);
+        int max_experience = stack.getOrDefault(MAX_EXPERIENCE, SculkVial.max_experience);
 
-        GuysBetterExploration.LOGGER.info("exp stored: " + experience_stored + " max exp: " + max_experience + " player exp: " + user.totalExperience);
+        log_experience("Before usage", stack, user);
 
         // Checks if the vial isn't full and if the user has experience
         if (experience_stored < max_experience && user.totalExperience > 0) {
@@ -67,17 +68,31 @@ public class SculkVial extends Item {
             stack.set(EXPERIENCE_STORED, experience_stored);
             user.addExperience(-experience_taken);
 
-            if (experience_stored < max_experience) {
-                return TypedActionResult.success(stack);
-            }
+            log_experience("After input", stack, user);
+
+            return TypedActionResult.success(stack);
+
         } else if (experience_stored >= max_experience) {
             user.addExperience(experience_stored);
+            stack.set(EXPERIENCE_STORED, 0);
             playSound(world, null, user.getBlockPos(), SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.BLOCKS);
-            playSound(world, null, user.getBlockPos(), SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.BLOCKS);
+
+            log_experience("After output", stack, user);
+
+            // Removes the item after usage
             stack.setCount(0);
             return TypedActionResult.success(stack);
         }
 
         return TypedActionResult.pass(stack);
+    }
+
+    private void log_experience(String status, ItemStack stack, PlayerEntity user) {
+        GuysBetterExploration.LOGGER.debug(
+                "{}: exp stored: {} max exp: {} player exp: {}",
+                status,
+                stack.get(EXPERIENCE_STORED),
+                stack.get(MAX_EXPERIENCE),
+                user.totalExperience);
     }
 }

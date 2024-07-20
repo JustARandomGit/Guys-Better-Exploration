@@ -10,7 +10,7 @@ public class ItemInit {
     public static final Item SCULK_VIAL = register("sculk_vial", new SculkVial(
             new Item.Settings()
                     .component(ComponentInit.EXPERIENCE_STORED, 0)
-                    .component(ComponentInit.MAX_EXPERIENCE, 1395)
+                    .component(ComponentInit.MAX_EXPERIENCE, SculkVial.max_experience)
                     .maxCount(1)
     ));
 
