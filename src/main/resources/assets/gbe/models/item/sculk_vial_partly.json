@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "gbe:item/sculk_vial/sculk_vial_partly"
+  }
+}

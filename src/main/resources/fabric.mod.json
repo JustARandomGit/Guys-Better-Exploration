@@ -1,0 +1,43 @@
+{
+	"schemaVersion": 1,
+	"id": "gbe",
+	"version": "${version}",
+	"name": "Guy's Better Exploration",
+	"description": "Introduces better exploration incentives and rewards, making minecraft's world more exciting!",
+	"authors": [
+		"JustARandomGuy"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/gbe/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"github.justarandomgit.gbe.GuysBetterExploration"
+		],
+		"client": [
+			"github.justarandomgit.gbe.GuysBetterExplorationClient"
+		],
+		"fabric-datagen": [
+			"github.justarandomgit.gbe.GuysBetterExplorationDataGenerator"
+		]
+	},
+	"mixins": [
+		"gbe.mixins.json",
+		{
+			"config": "gbe.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.15.11",
+		"minecraft": "~1.21",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+	}
+}
